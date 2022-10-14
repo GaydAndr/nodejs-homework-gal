@@ -1,6 +1,7 @@
 const { Schema, model } = require('mongoose');
+const Joi = require('joi');
 
-const contacts = new Schema({
+const contactSchema = new Schema({
   name: {
     type: String,
     required: [true, 'Set name for contact'],
@@ -17,6 +18,35 @@ const contacts = new Schema({
   },
 });
 
-const Contact = model('contact', contacts);
+const isConflict = ({ name, code }) =>
+  name === 'MangoServerError' && code === 11000;
 
-module.exports = Contact;
+const handleSaveError = (error, _, next) => {
+  error.status = isConflict(error) ? 409 : 400;
+  next();
+};
+
+contactSchema.post('save', handleSaveError);
+
+const addSchema = Joi.object({
+  name: Joi.string().required(),
+  email: Joi.string().required(),
+  phone: Joi.string().required(),
+  favorite: Joi.boolean(),
+});
+
+const updateFavoriteSchema = Joi.object({
+  favorite: Joi.boolean().required(),
+});
+
+const schema = {
+  addSchema,
+  updateFavoriteSchema,
+};
+
+const Contact = model('contact', contactSchema);
+
+module.exports = {
+  Contact,
+  schema,
+};

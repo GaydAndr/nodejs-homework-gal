@@ -1,99 +1,29 @@
 const express = require('express');
-const Joi = require('joi');
-const RequestError = require('../../helpers/RequestError');
-const Contact = require('../../models/contacts');
+
+const ctrl = require('../../controllers/contacts');
+const { ctrlWrapper } = require('../../helpers');
+const { validateBody } = require('../../middleware');
+const { schema } = require('../../models/contacts');
 
 const router = express.Router();
+router.get('/', ctrlWrapper(ctrl.getAll));
 
-const Schema = Joi.object({
-  name: Joi.string().required(),
-  email: Joi.string().required(),
-  phone: Joi.string().required(),
-  favorite: Joi.boolean(),
-});
+router.get('/:id', ctrlWrapper(ctrl.getContactById));
 
-const SchemaUpdateFavorite = Joi.object({
-  favorite: Joi.boolean().required(),
-});
+router.post('/', validateBody(schema.addSchema), ctrlWrapper(ctrl.addCont));
 
-router.get('/', async (req, res, next) => {
-  try {
-    const result = await Contact.find();
-    res.json(result);
-  } catch (error) {
-    next(error);
-  }
-});
+router.put(
+  '/:id',
+  validateBody(schema.addSchema),
+  ctrlWrapper(ctrl.updateContact)
+);
 
-router.get('/:contactId', async (req, res, next) => {
-  try {
-    const { contactId } = req.params;
-    const result = await Contact.findById({ _id: contactId });
-    if (!result) {
-      throw RequestError(404);
-    }
-    res.json(result);
-  } catch (error) {
-    next(error);
-  }
-});
+router.delete('/:id', ctrlWrapper(ctrl.removeContact));
 
-router.post('/', async (req, res, next) => {
-  try {
-    const { error } = Schema.validate(req.body);
-    const result = await Contact.create(req.body);
-    if (error) {
-      throw RequestError(400, 'missing required name field');
-    }
-    res.status(201).json(result);
-  } catch (error) {
-    next(error);
-  }
-});
-
-router.delete('/:contactId', async (req, res, next) => {
-  try {
-    const { contactId } = req.params;
-    const result = await Contact.findByIdAndRemove(contactId);
-    if (!result) {
-      throw RequestError(404);
-    }
-    res.json(result);
-  } catch (error) {
-    next(error);
-  }
-});
-
-router.put('/:contactId', async (req, res, next) => {
-  try {
-    const { error } = Schema.validate(req.body);
-    const { contactId } = req.params;
-    const result = await Contact.findByIdAndUpdate(contactId, req.body, {
-      new: true,
-    });
-    if (error) {
-      throw RequestError(400, 'missing fields');
-    }
-    res.json(result);
-  } catch (error) {
-    next(error);
-  }
-});
-
-router.patch('/:contactId/favorite', async (req, res, next) => {
-  try {
-    const { error } = SchemaUpdateFavorite.validate(req.body);
-    const { contactId } = req.params;
-    const result = await Contact.findByIdAndUpdate(contactId, req.body, {
-      new: true,
-    });
-    if (error) {
-      throw RequestError(400, 'missing field Favorite');
-    }
-    res.json(result);
-  } catch (error) {
-    next(error);
-  }
-});
+router.patch(
+  '/:id/favorite',
+  validateBody(schema.updateFavoriteSchema),
+  ctrlWrapper(ctrl.updateFavorite)
+);
 
 module.exports = router;
