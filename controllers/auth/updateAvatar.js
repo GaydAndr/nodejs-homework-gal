@@ -29,8 +29,6 @@ const updateAvatar = async (req, res) => {
       avatarURL,
     });
   } catch (error) {
-    console.log(123);
-
     await fs.unlink(req.file.path);
     throw error;
   }
