@@ -1,13 +1,6 @@
 const { Schema, model } = require('mongoose');
 const Joi = require('joi');
-
-const isConflict = ({ name, code }) =>
-  name === 'MangoServerError' && code === 11000;
-
-const handleSaveError = (error, _, next) => {
-  error.status = isConflict(error) ? 409 : 400;
-  next();
-};
+const { handleSaveError } = require('../helpers');
 
 const userSchema = new Schema(
   {
@@ -28,6 +21,10 @@ const userSchema = new Schema(
     token: {
       type: String,
       default: null,
+    },
+    avatarURL: {
+      type: String,
+      required: true,
     },
   },
   { versionKey: false }
