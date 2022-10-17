@@ -7,8 +7,9 @@ const messages = {
 };
 
 const RequestError = (status, message = messages[status]) => {
+  console.log('here');
   const error = new Error(message);
   error.status = status;
   return error;
 };
-module.export = RequestError;
+module.exports = RequestError;

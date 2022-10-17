@@ -6,11 +6,12 @@ const getCurrentUser = async (req, res) => {
   if (!user) {
     throw new RequestError(401, 'Not authorized');
   }
-  const { email, subscription } = user;
+  const { email, subscription, avatarURL } = user;
 
   res.status(200).json({
     email,
     subscription,
+    avatarURL,
   });
 };
 
