@@ -26,7 +26,7 @@ router.get('/current', authenticate, ctrlWrapper(ctrl.getCurrentUser));
 router.patch(
   '/avatars',
   authenticate,
-  upload.single('avatar'),
+  upload.single('avatarURL'),
   ctrlWrapper(ctrl.updateAvatar)
 );
 
