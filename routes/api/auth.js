@@ -19,6 +19,14 @@ router.post(
   ctrlWrapper(ctrl.login)
 );
 
+router.get('/varify/:verificationToken', ctrlWrapper(ctrl.verifyEmail));
+
+router.post(
+  '/varify',
+  validateBody(schemas.emailSchema),
+  ctrlWrapper(ctrl.resendEmail)
+);
+
 router.get('/logout', authenticate, ctrlWrapper(ctrl.logout));
 
 router.get('/current', authenticate, ctrlWrapper(ctrl.getCurrentUser));
