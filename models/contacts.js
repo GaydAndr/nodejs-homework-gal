@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const { Schema, model } = require('mongoose');
 const Joi = require('joi');
+const { handleSaveError } = require('../helpers');
 
 const contactSchema = new Schema({
   name: {
@@ -23,13 +24,13 @@ const contactSchema = new Schema({
   },
 });
 
-const isConflict = ({ name, code }) =>
-  name === 'MangoServerError' && code === 11000;
+// const isConflict = ({ name, code }) =>
+//   name === 'MangoServerError' && code === 11000;
 
-const handleSaveError = (error, _, next) => {
-  error.status = isConflict(error) ? 409 : 400;
-  next();
-};
+// const handleSaveError = (error, _, next) => {
+//   error.status = isConflict(error) ? 409 : 400;
+//   next();
+// };
 
 contactSchema.post('save', handleSaveError);
 
